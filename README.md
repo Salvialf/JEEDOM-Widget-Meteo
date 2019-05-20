@@ -1,1 +1,1 @@
-# JEEDOM-Widget-Meteo
+# Meteo

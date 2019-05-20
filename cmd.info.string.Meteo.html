@@ -1,0 +1,194 @@
+<!--    		*******      PARAMETRES    *******      		-->
+<!-- 'ville': nom de la ville 
+		  ou "ville,pays"(pays = fr / be / ch /ca...)
+		  ou coordonnées géographiques "latitude, longitude"
+		Exemple: ville= "paris", ou "paris,fr" ou "48.87,2.33"	-->
+<!-- 'cleAPI': saisir clé API obtenue sur https://www.apixu.com	-->
+<!-- 'previsions': "off" pour désactiver les prévisions			-->
+
+<div style="width:300px;height:240px;" class="cmd tooltips cmd-widget" data-type="info" data-subtype="string" data-cmd_id="#id#" data-cmd_uid="#uid#">
+  <link rel="stylesheet" href="plugins/widget/core/template/dashboard/cmd.info.string.Meteo/css/weather-icons.css">  
+  <center><span style="font-size:20px;font-weight:bold;" class="cursor" id="villeName#id#"></span><span id="regionName#id#"></span><br>
+  <div class="iconWeather#uid#">
+    <div class="UVindex#uid#">UV<span id="indiceUV#id#"></span></div>
+  	<img style="margin-top:-10px;" id="tempIcon#id#" height="100" width="100">
+    <div id="weather#id#"></div>
+  </div>
+  <div class="donnees#uid#">
+    <i class="wi wi-barometer"></i> <span id="baroVille#id#"></span><br>
+    <i class="wi wi-thermometer"></i> <span id="tempVille#id#"></span> - <i class="wi wi-humidity"></i> <span id="humVille#id#"></span><br>
+  	<i class="wi wi-strong-wind"></i> <span id="vitesseVent#id#"></span> <i class="wi wi-wind-direction"></i> <span id="dirVent#id#"></span><br>
+    <i class="wi wi-sunrise"></i> <span id="sunRise#id#"></span> <i class="wi wi-sunset"></i> <span id="sunSet#id#"></span>
+  </div>
+  <div class="previsions#uid#">
+  <div class="prevDay">
+    <span id="date0#id#"></span>
+    <img style="margin-top:-5px;" id="tempIcon0#id#" height="50" width="50">
+    <span id="MinMax0#id#"></span>
+  </div>
+    <div class="prevDay">
+    <span id="date1#id#"></span>
+    <img style="margin-top:-5px;" id="tempIcon1#id#" height="50" width="50">
+    <span id="MinMax1#id#"></span>
+  </div>
+	<div class="prevDay">
+    <span id="date2#id#"></span>
+    <img style="margin-top:-5px;" id="tempIcon2#id#" height="50" width="50">
+    <span id="MinMax2#id#"></span>
+  </div>
+    <div class="prevDay">
+    <span id="date3#id#"></span>
+    <img style="margin-top:-5px;" id="tempIcon3#id#" height="50" width="50">
+    <span id="MinMax3#id#"></span>
+  </div>
+    <div class="prevDay">
+    <span id="date4#id#"></span>
+    <img style="margin-top:-5px;" id="tempIcon4#id#" height="50" width="50">
+    <span id="MinMax4#id#"></span>
+  </div>
+    </div></center>
+<style>
+.wi {
+	font-size:19px;
+  }
+.iconWeather#uid# {
+  	float:left;
+  	width:130px;
+  	height:120px;
+  	margin-top:8px;
+  }
+#weather#id# {
+  	font-weight:bold;
+  	height:30px;
+  	line-height:1;
+  	overflow:hidden;
+  }
+.UVindex#uid# {
+  	left:105px;
+  	top:35px;
+  	height:36px;
+  	width:36px;
+  	border-radius:18px;
+  	position:absolute;
+  	line-height:1.1;
+  	padding-top:1px;
+  	text-shadow: 1px 1px 3px rgba(0,0,0,0.75);
+  }
+#indiceUV#id# {
+  	font-size:22px;
+  	font-weight:bold;
+  	display:block;
+  	margin-top:-5px;
+  }
+.donnees#uid# {
+  	width:170px;
+  	height:120px;
+  	line-height:1.7;
+  	font-size:16px;
+  	float:right;
+  	margin-top:8px;
+  	padding-top:6px;
+  }
+.previsions#uid# {
+  	box-shadow:0px 2px 2px 0px rgba(0, 0, 0, 1),0px 2px 2px 0px rgba(255, 255, 255, 0.5) inset;
+  	border-radius:5px;
+  	font-size:9px;
+  	display:inline-block;
+  	padding-top:2px;
+  	margin-top:5px;
+  }
+.prevDay {
+  	width:55px;
+  	display:inline-block;
+  }
+</style>
+<script>
+function fetch() {
+  	var town = ('#ville#' !='#'+'ville#') ? "#ville#":"paris"; 
+  	var APIKey = ('#cleAPI#' !='#'+'cleAPI#') ? "#cleAPI#":"9271121b5c3d4c36ad322336172809";
+  	var url = "https://api.apixu.com/v1/forecast.json?key="+APIKey+"&q="+town+"&days=5&lang=fr";
+    $.getJSON(url, function(dataWeather) {
+      
+      $('#villeName#id#').text(dataWeather.location.name).attr('title',dataWeather.current.last_updated);
+      $('#regionName#id#').text(", "+dataWeather.location.region);
+      $('#tempIcon#id#').attr('src',dataWeather.current.condition.icon).attr('title','Nuages: '+dataWeather.current.cloud+'%');
+      $('#weather#id#').text(dataWeather.current.condition.text).attr('title',dataWeather.current.condition.text);
+      $('#tempVille#id#').text((Math.round(dataWeather.current.temp_f - 32) /1.8).toFixed(1)+'°C').attr('title','T° ressentie: '+(Math.round(dataWeather.current.feelslike_f - 32) /1.8).toFixed(1)+'°C');
+      $('#humVille#id#').text(dataWeather.current.humidity+'%').attr('title','Pluie: '+dataWeather.current.precip_mm+'mm(h) - '+dataWeather.forecast.forecastday[0].day.totalprecip_mm+'mm(total)');
+      $('#baroVille#id#').text(dataWeather.current.pressure_mb+'hPa');  
+      $('#vitesseVent#id#').text(dataWeather.current.wind_kph+'km/h').attr('title',dataWeather.current.gust_kph+'km/h en rafale');
+      $('#dirVent#id#').text(dataWeather.current.wind_dir).attr('title',dataWeather.current.wind_degree+'°');
+      $('#indiceUV#id#').text(dataWeather.current.uv);
+      
+      if(dataWeather.current.pressure_mb < 975){ $('#baroVille#id#').attr('title', 'Tempête'); tendance='Tempête';}
+      else if(dataWeather.current.pressure_mb >= 975 && dataWeather.current.pressure_mb <= 1005){ $('#baroVille#id#').attr('title', 'Pluie ou Vent'); tendance='Pluie ou Vent';}
+      else if(dataWeather.current.pressure_mb > 1005 && dataWeather.current.pressure_mb <= 1025){ $('#baroVille#id#').attr('title', 'Variable'); tendance='Variable';}
+      else if(dataWeather.current.pressure_mb > 1025 && dataWeather.current.pressure_mb <= 1050){ $('#baroVille#id#').attr('title', 'Beau Temps'); tendance='Beau Temps';}
+      else if(dataWeather.current.pressure_mb > 1050){ $('#baroVille#id#').attr('title', 'Temps Sec'); tendance='Temps Sec';}
+
+       switch (dataWeather.current.uv) {
+         case 0 : $('.UVindex#uid#').hide(); uv='Nuit'; break;
+         case 1 : $('.UVindex#uid#').show().css('background-color','#62A733').attr('title','Faible'); uv='Faible'; break;
+         case 2 : $('.UVindex#uid#').show().css('background-color','#A2C418').attr('title','Faible'); uv='Faible'; break;
+         case 3 : $('.UVindex#uid#').show().css('background-color','#EFE200').attr('title','Modéré'); uv='Modéré'; break;
+         case 4 : $('.UVindex#uid#').show().css('background-color','#F9CA18').attr('title','Modéré'); uv='Modéré'; break;
+         case 5 : $('.UVindex#uid#').show().css('background-color','#F7A60E').attr('title','Modéré'); uv='Modéré'; break;
+         case 6 : $('.UVindex#uid#').show().css('background-color','#F38001').attr('title','Elevé'); uv='Elevé'; break;
+         case 7 : $('.UVindex#uid#').show().css('background-color','#EB6A0F').attr('title','Elevé'); uv='Elevé'; break;
+         case 8 : $('.UVindex#uid#').show().css('background-color','#E5381A').attr('title','Très élevé'); uv='Très élevé'; break;
+         case 9 : $('.UVindex#uid#').show().css('background-color','#FF002E').attr('title','Très élevé'); uv='Très élevé'; break;
+         case 10 : $('.UVindex#uid#').show().css('background-color','#FF007A').attr('title','Très élevé'); uv='Très élevé'; break;
+         case 11 : $('.UVindex#uid#').show().css('background-color','#D000B9').attr('title','Extrème'); uv='Extrème'; break;
+       }
+      
+      var sunrise = dataWeather.forecast.forecastday[0].astro.sunrise;
+      var moonrise = dataWeather.forecast.forecastday[0].astro.moonrise;
+      $('#sunRise#id#').text(sunrise.replace('AM', ' ')).attr('title',"Lune: "+(parseInt(moonrise.slice(0, 2))+12+":"+moonrise.slice(3, 5)));
+      var sunset = dataWeather.forecast.forecastday[0].astro.sunset;
+      var moonset = dataWeather.forecast.forecastday[0].astro.moonset.replace('AM', ' ');
+      $('#sunSet#id#').text(parseInt(sunset.slice(0, 2))+12+":"+sunset.slice(3, 5)).attr('title',"Lune: "+moonset);
+      
+      var date0 = new Date(dataWeather.forecast.forecastday[0].date);
+      var format0 = $.datepicker.formatDate('D dd/mm', date0);
+      var date1 = new Date(dataWeather.forecast.forecastday[1].date);
+      var format1 = $.datepicker.formatDate('D dd/mm', date1);
+      var date2 = new Date(dataWeather.forecast.forecastday[2].date);
+      var format2 = $.datepicker.formatDate('D dd/mm', date2);
+      var date3 = new Date(dataWeather.forecast.forecastday[3].date);
+      var format3 = $.datepicker.formatDate('D dd/mm', date3);
+      var date4 = new Date(dataWeather.forecast.forecastday[4].date);
+      var format4 = $.datepicker.formatDate('D dd/mm', date4);
+      
+      $('#date0#id#').text(format0);
+      $('#date1#id#').text(format1);
+      $('#date2#id#').text(format2);
+      $('#date3#id#').text(format3);
+      $('#date4#id#').text(format4);
+            
+      $('#tempIcon0#id#').attr({'src':dataWeather.forecast.forecastday[0].day.condition.icon,'title':dataWeather.forecast.forecastday[0].day.condition.text});
+      $('#tempIcon1#id#').attr({'src':dataWeather.forecast.forecastday[1].day.condition.icon,'title':dataWeather.forecast.forecastday[1].day.condition.text});
+      $('#tempIcon2#id#').attr({'src':dataWeather.forecast.forecastday[2].day.condition.icon,'title':dataWeather.forecast.forecastday[2].day.condition.text});
+      $('#tempIcon3#id#').attr({'src':dataWeather.forecast.forecastday[3].day.condition.icon,'title':dataWeather.forecast.forecastday[3].day.condition.text});
+      $('#tempIcon4#id#').attr({'src':dataWeather.forecast.forecastday[4].day.condition.icon,'title':dataWeather.forecast.forecastday[4].day.condition.text});
+        
+      $('#MinMax0#id#').text(dataWeather.forecast.forecastday[0].day.mintemp_c+'|'+dataWeather.forecast.forecastday[0].day.maxtemp_c);
+      $('#MinMax1#id#').text(dataWeather.forecast.forecastday[1].day.mintemp_c+'|'+dataWeather.forecast.forecastday[1].day.maxtemp_c);
+      $('#MinMax2#id#').text(dataWeather.forecast.forecastday[2].day.mintemp_c+'|'+dataWeather.forecast.forecastday[2].day.maxtemp_c);
+      $('#MinMax3#id#').text(dataWeather.forecast.forecastday[3].day.mintemp_c+'|'+dataWeather.forecast.forecastday[3].day.maxtemp_c);
+      $('#MinMax4#id#').text(dataWeather.forecast.forecastday[4].day.mintemp_c+'|'+dataWeather.forecast.forecastday[4].day.maxtemp_c);
+      
+      $('#villeName#id#').off().on('click', function() {
+        alert(dataWeather.current.last_updated+'\n'+dataWeather.current.condition.text+'\nT° ressentie: '+(Math.round(dataWeather.current.feelslike_f - 32) /1.8).toFixed(1)+'°C'+
+              '\nPluie: '+dataWeather.current.precip_mm+'mm(h) - '+dataWeather.forecast.forecastday[0].day.totalprecip_mm+'mm(total)'+
+              '\nVent: '+dataWeather.current.gust_kph+'km/h en rafale ('+dataWeather.current.wind_degree+'°)'+'\nNuages: '+dataWeather.current.cloud+'%'+'\nTendance: '+tendance+
+              '\nRisque UV: '+uv+'\nLune: lever à '+(parseInt(moonrise.slice(0, 2))+12+":"+moonrise.slice(3, 5))+' - coucher à '+moonset);
+    });
+     });
+}
+  setInterval(fetch, 600000);
+ fetch();
+  
+  if ('#previsions#' == 'off') $('.previsions#uid#').hide();  
+
+</script>
+</div>
