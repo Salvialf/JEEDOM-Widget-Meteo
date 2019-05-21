@@ -105,7 +105,7 @@
 <script>
 function fetch() {
   	var town = ('#ville#' !='#'+'ville#') ? "#ville#":"paris"; 
-  	var APIKey = ('#cleAPI#' !='#'+'cleAPI#') ? "#cleAPI#":"9271121b5c3d4c36ad322336172809";
+  	var APIKey = ('#cleAPI#' !='#'+'cleAPI#') ? "#cleAPI#":"2483f0621c7245c2aaa182928171306";
   	var url = "https://api.apixu.com/v1/forecast.json?key="+APIKey+"&q="+town+"&days=5&lang=fr";
     $.getJSON(url, function(dataWeather) {
       
@@ -140,13 +140,17 @@ function fetch() {
          case 10 : $('.UVindex#uid#').show().css('background-color','#FF007A').attr('title','Très élevé'); uv='Très élevé'; break;
          case 11 : $('.UVindex#uid#').show().css('background-color','#D000B9').attr('title','Extrème'); uv='Extrème'; break;
        }
-      
-      var sunrise = dataWeather.forecast.forecastday[0].astro.sunrise;
-      var moonrise = dataWeather.forecast.forecastday[0].astro.moonrise;
-      $('#sunRise#id#').text(sunrise.replace('AM', ' ')).attr('title',"Lune: "+(parseInt(moonrise.slice(0, 2))+12+":"+moonrise.slice(3, 5)));
-      var sunset = dataWeather.forecast.forecastday[0].astro.sunset;
+            
+      var sunrise = dataWeather.forecast.forecastday[0].astro.sunrise.replace('AM', ' ');
+      if (dataWeather.forecast.forecastday[0].astro.moonrise == "No moonrise") { moonrise = "non";}
+      else if (dataWeather.forecast.forecastday[0].astro.moonrise.slice(6, 8) == "AM") { 
+        if (dataWeather.forecast.forecastday[0].astro.moonrise.slice(0, 2) == 12) moonrise = "00:"+dataWeather.forecast.forecastday[0].astro.moonrise.slice(3, 5);
+        else moonrise = dataWeather.forecast.forecastday[0].astro.moonrise.replace('AM', ' ');}
+      else { moonrise = parseInt(dataWeather.forecast.forecastday[0].astro.moonrise.slice(0, 2))+12+":"+dataWeather.forecast.forecastday[0].astro.moonrise.slice(3, 5);}
+      $('#sunRise#id#').text(sunrise).attr('title',"Lune: "+moonrise);
+      var sunset = parseInt(dataWeather.forecast.forecastday[0].astro.sunset.slice(0, 2))+12+":"+dataWeather.forecast.forecastday[0].astro.sunset.slice(3, 5);
       var moonset = dataWeather.forecast.forecastday[0].astro.moonset.replace('AM', ' ');
-      $('#sunSet#id#').text(parseInt(sunset.slice(0, 2))+12+":"+sunset.slice(3, 5)).attr('title',"Lune: "+moonset);
+      $('#sunSet#id#').text(sunset).attr('title',"Lune: "+moonset);
       
       var date0 = new Date(dataWeather.forecast.forecastday[0].date);
       var format0 = $.datepicker.formatDate('D dd/mm', date0);
@@ -181,7 +185,7 @@ function fetch() {
         alert(dataWeather.current.last_updated+'\n'+dataWeather.current.condition.text+'\nT° ressentie: '+(Math.round(dataWeather.current.feelslike_f - 32) /1.8).toFixed(1)+'°C'+
               '\nPluie: '+dataWeather.current.precip_mm+'mm(h) - '+dataWeather.forecast.forecastday[0].day.totalprecip_mm+'mm(total)'+
               '\nVent: '+dataWeather.current.gust_kph+'km/h en rafale ('+dataWeather.current.wind_degree+'°)'+'\nNuages: '+dataWeather.current.cloud+'%'+'\nTendance: '+tendance+
-              '\nRisque UV: '+uv+'\nLune: lever à '+(parseInt(moonrise.slice(0, 2))+12+":"+moonrise.slice(3, 5))+' - coucher à '+moonset);
+              '\nRisque UV: '+uv+'\nLune: lever '+moonrise+' - coucher '+moonset);
     });
      });
 }
