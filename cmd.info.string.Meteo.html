@@ -109,13 +109,16 @@ function fetch() {
   	var url = "https://api.apixu.com/v1/forecast.json?key="+APIKey+"&q="+town+"&days=5&lang=fr";
     $.getJSON(url, function(dataWeather) {
       
-      $('#villeName#id#').text(dataWeather.location.name).attr('title',dataWeather.current.last_updated);
+      var t = dataWeather.current.last_updated.split(/[- :]/);
+      var update = "Le "+t[2]+"/"+t[1]+"/"+t[0]+" à "+t[3]+":"+t[4];
+      
+      $('#villeName#id#').text(dataWeather.location.name).attr('title',update);
       $('#regionName#id#').text(", "+dataWeather.location.region);
       $('#tempIcon#id#').attr('src',dataWeather.current.condition.icon).attr('title','Nuages: '+dataWeather.current.cloud+'%');
       $('#weather#id#').text(dataWeather.current.condition.text).attr('title',dataWeather.current.condition.text);
       $('#tempVille#id#').text((Math.round(dataWeather.current.temp_f - 32) /1.8).toFixed(1)+'°C').attr('title','T° ressentie: '+(Math.round(dataWeather.current.feelslike_f - 32) /1.8).toFixed(1)+'°C');
       $('#humVille#id#').text(dataWeather.current.humidity+'%').attr('title','Pluie: '+dataWeather.current.precip_mm+'mm(h) - '+dataWeather.forecast.forecastday[0].day.totalprecip_mm+'mm(total)');
-      $('#baroVille#id#').text(dataWeather.current.pressure_mb+'hPa');  
+      $('#baroVille#id#').text(dataWeather.current.pressure_mb+' hPa');  
       $('#vitesseVent#id#').text(dataWeather.current.wind_kph+'km/h').attr('title',dataWeather.current.gust_kph+'km/h en rafale');
       $('#dirVent#id#').text(dataWeather.current.wind_dir).attr('title',dataWeather.current.wind_degree+'°');
       $('#indiceUV#id#').text(dataWeather.current.uv);
@@ -182,7 +185,7 @@ function fetch() {
       $('#MinMax4#id#').text(dataWeather.forecast.forecastday[4].day.mintemp_c+'|'+dataWeather.forecast.forecastday[4].day.maxtemp_c);
       
       $('#villeName#id#').off().on('click', function() {
-        alert(dataWeather.current.last_updated+'\n'+dataWeather.current.condition.text+'\nT° ressentie: '+(Math.round(dataWeather.current.feelslike_f - 32) /1.8).toFixed(1)+'°C'+
+        alert(update+'\n'+dataWeather.current.condition.text+'\nT° ressentie: '+(Math.round(dataWeather.current.feelslike_f - 32) /1.8).toFixed(1)+'°C'+
               '\nPluie: '+dataWeather.current.precip_mm+'mm(h) - '+dataWeather.forecast.forecastday[0].day.totalprecip_mm+'mm(total)'+
               '\nVent: '+dataWeather.current.gust_kph+'km/h en rafale ('+dataWeather.current.wind_degree+'°)'+'\nNuages: '+dataWeather.current.cloud+'%'+'\nTendance: '+tendance+
               '\nRisque UV: '+uv+'\nLune: lever '+moonrise+' - coucher '+moonset);
@@ -190,7 +193,7 @@ function fetch() {
      });
 }
   setInterval(fetch, 600000);
- fetch();
+  fetch();
   
   if ('#previsions#' == 'off') $('.previsions#uid#').hide();  
 
